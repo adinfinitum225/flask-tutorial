@@ -23,7 +23,7 @@ def register():
             error='Maybe nobody will guess a blank password'
         elif db.execute(
                 'SELECT id FROM user WHERE username = ?', (username,)).fetchone() is not None:
-            error = 'You can\' steal {}\' name'.format(username)
+            error = 'You can\'t steal {}\'s name'.format(username)
 
         if error is None:
             db.execute(
@@ -50,7 +50,7 @@ def login():
 
         if user is None:
             error = 'Are you sure you registered?'
-        elif check_password_hash(user['password'], password):
+        elif not check_password_hash(user['password'], password):
             error = 'Maybe you typed your password wrong?'
 
         if error is None:
@@ -82,7 +82,7 @@ def logout():
 
 
 def login_required(view):
-    @functools.wrap(view)
+    @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('auth.login'))
